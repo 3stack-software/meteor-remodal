@@ -11,7 +11,9 @@ You can then create & open modals by calling `Remodal.open('<modal name>', templ
 Usage
 -----------------------
 
-1. Wrap your modal in a template with the same name
+1. add `{{> remodal remodalData}}` to the `<body>` tag (or in your layout template).
+
+2. Wrap your modal in a template with the same name
 
 ```handlebars
 <template name="myCustomModal">
@@ -30,9 +32,9 @@ Usage
 </template>
 ```
 
-2. Then call from your code `Remodal.open('myCustomModal')`
+3. Then call from your code `Remodal.open('myCustomModal')`
 
-3. When done, call `Remodal.close()`, the modal will be reactively removed from the DOM.
+4. When done, call `Remodal.close()`, the modal will be reactively removed from the DOM.
 
 API
 -------------------------
@@ -51,7 +53,6 @@ Pass a delay, and it will automatically close the modal after the timeout comple
 
 `Remodal.data()`
 Returns the data passed to `Remodal.open`
-
 
 `Remdoal.fastReset()`
 Destroys the modal & template without waiting for the close animation.
