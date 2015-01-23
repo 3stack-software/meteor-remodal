@@ -28,6 +28,7 @@ Usage
     </div>
   </div>
 </template>
+```
 
 2. Then call from your code `Remodal.open('myCustomModal')`
 

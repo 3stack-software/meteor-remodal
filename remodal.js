@@ -23,10 +23,10 @@ _.extend(RemodalManager.prototype, {
   },
 
   isOpen: function () {
-    return !this._templateName.equals(null);
+    return !this._templateName.get() == null;
   },
   isModal: function (templateName) {
-    return this._templateName.equals(templateName);
+    return this._templateName.get() == templateName;
   },
   open: function (templateName, data, beforeShown) {
     var self = this, $currentModal, doOpen;
@@ -120,7 +120,7 @@ $(window).on('popstate', function () {
 
 Template.remodal.helpers({
   remodalData: function (target) {
-    if (Remodal._target.equals(target != null ? target : null)) {
+    if (Remodal._target.get() == (target != null ? target : null)) {
       return EJSON.parse(Remodal._data.get());
     }
   },
