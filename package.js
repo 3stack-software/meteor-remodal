@@ -1,6 +1,6 @@
 Package.describe({
   name: '3stack:remodal',
-  version: '1.0.1',
+  version: '1.0.2',
   summary: 'A library for reactively launching bootstrap modals',
   git: 'https://github.com/3stack-software/meteor-remodal',
   documentation: 'README.md'
@@ -18,6 +18,8 @@ Package.onUse(function (api) {
     'ejson',
     'underscore'
   ], 'client');
+
+  api.use('iron:router@1.0.0', 'client', {weak: true});
 
   api.export('Remodal', 'client');
 

@@ -9,9 +9,18 @@ function RemodalManager() {
 }
 
 _.extend(RemodalManager.prototype, {
-  get: function () {
-    var $sel, templateName;
-    templateName = this._templateName.get(false);
+  getTemplateName: function (nonReactive){
+    var self = this;
+    if (nonReactive){
+      return Tracker.nonreactive(function(){ return self._templateName.get(); })
+    } else {
+      return self._templateName.get();
+    }
+  },
+  get: function (nonReactive) {
+    var self = this,
+      $sel,
+      templateName = self.getTemplateName(nonReactive);
     if (templateName == null) {
       return;
     }
@@ -22,11 +31,13 @@ _.extend(RemodalManager.prototype, {
     return $sel;
   },
 
-  isOpen: function () {
-    return !this._templateName.get() == null;
+  isOpen: function (nonReactive) {
+    var self = this;
+    return self.getTemplateName(nonReactive) != null;
   },
-  isModal: function (templateName) {
-    return this._templateName.get() == templateName;
+  isModal: function (templateName, nonReactive) {
+    var self = this;
+    return self.getTemplateName(nonReactive) === templateName;
   },
   open: function (templateName, data, beforeShown) {
     var self = this, $currentModal, doOpen;
@@ -36,7 +47,7 @@ _.extend(RemodalManager.prototype, {
     if (beforeShown == null) {
       beforeShown = null;
     }
-    if (self.isModal(templateName)) {
+    if (self.isModal(templateName, true)) {
       return;
     }
     doOpen = function () {
@@ -44,7 +55,7 @@ _.extend(RemodalManager.prototype, {
       self._templateName.set(templateName);
       self._data.set(EJSON.stringify(data));
       Tracker.flush();
-      $modal = self.get();
+      $modal = self.get(true);
       if ($modal == null) {
         return;
       }
@@ -59,7 +70,7 @@ _.extend(RemodalManager.prototype, {
       }
       $modal.modal("show");
     };
-    $currentModal = Remodal.get();
+    $currentModal = self.get(true);
     if ($currentModal != null) {
       $currentModal.one('hidden.bs.modal', function () {
         doOpen();
@@ -70,40 +81,45 @@ _.extend(RemodalManager.prototype, {
     }
   },
   reset: function () {
-    this._templateName.set(null);
-    this._data.set(EJSON.stringify(null));
-    if (this._closeTimer) {
-      Meteor.clearTimeout(this._closeTimer);
+    var self = this;
+    self._templateName.set(null);
+    self._data.set(EJSON.stringify(null));
+    if (self._closeTimer) {
+      Meteor.clearTimeout(self._closeTimer);
     }
-    this._closeTimer = null;
+    self._closeTimer = null;
   },
   resetTarget: function () {
-    this._target.set(null);
+    var self = this;
+    self._target.set(null);
   },
   setTarget: function (target) {
-    return this._target.set(target);
+    var self = this;
+    self._target.set(target);
   },
   close: function () {
     var _ref;
-    if ((_ref = Remodal.get()) != null) {
+    if ((_ref = this.get(true)) != null) {
       _ref.modal('hide');
     }
   },
   deferClose: function (timeout) {
-    if (this._closeTimer) {
-      Meteor.clearTimeout(this._closeTimer);
+    var self = this;
+    if (self._closeTimer) {
+      Meteor.clearTimeout(self._closeTimer);
     }
     this._closeTimer = Meteor.setTimeout(function () {
-      return Remodal.close();
+      return self.close();
     }, timeout);
   },
   fastReset: function () {
-    var _ref;
-    if ((_ref = Remodal.get()) != null) {
-      _ref.off('hidden.bs.modal').removeClass('fade').modal('hide');
+    var self = this,
+        currentModal = self.get(true);
+    if (currentModal != null) {
+      currentModal.off('hidden.bs.modal').removeClass('fade').modal('hide');
     }
-    Remodal.reset();
-    Remodal.resetTarget();
+    self.reset();
+    self.resetTarget();
   },
   data: function () {
     return EJSON.parse(this._data.get());
@@ -134,3 +150,10 @@ Template.remodal.helpers({
   }
 });
 
+// Automatically close modal if the user changes route
+if (Meteor.isClient && Package['iron:router'] != null){
+  Package['iron:router'].Router.onRun(function() {
+    Remodal.fastReset();
+    this.next();
+  });
+}
