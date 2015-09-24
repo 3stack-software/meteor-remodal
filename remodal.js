@@ -3,7 +3,7 @@
 
 function RemodalManager() {
   this._templateName = new ReactiveVar();
-  this._data = new ReactiveVar(EJSON.stringify(null));
+  this._data = new ReactiveVar(null);
   this._target = new ReactiveVar(null);
   this._closeTimer = null;
 }
@@ -53,7 +53,7 @@ _.extend(RemodalManager.prototype, {
     doOpen = function () {
       var $modal;
       self._templateName.set(templateName);
-      self._data.set(EJSON.stringify(data));
+      self._data.set(data);
       Tracker.flush();
       $modal = self.get(true);
       if ($modal == null) {
@@ -83,7 +83,7 @@ _.extend(RemodalManager.prototype, {
   reset: function () {
     var self = this;
     self._templateName.set(null);
-    self._data.set(EJSON.stringify(null));
+    self._data.set(null);
     if (self._closeTimer) {
       Meteor.clearTimeout(self._closeTimer);
     }
@@ -122,7 +122,7 @@ _.extend(RemodalManager.prototype, {
     self.resetTarget();
   },
   data: function () {
-    return EJSON.parse(this._data.get());
+    return this._data.get();
   }
 });
 
@@ -137,7 +137,7 @@ $(window).on('popstate', function () {
 Template.remodal.helpers({
   remodalData: function (target) {
     if (Remodal._target.get() == (target != null ? target : null)) {
-      return EJSON.parse(Remodal._data.get());
+      return Remodal._data.get();
     }
   },
   _remodal: function () {

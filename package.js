@@ -1,6 +1,6 @@
 Package.describe({
   name: '3stack:remodal',
-  version: '1.0.2',
+  version: '1.0.3',
   summary: 'A library for reactively launching bootstrap modals',
   git: 'https://github.com/3stack-software/meteor-remodal',
   documentation: 'README.md'
